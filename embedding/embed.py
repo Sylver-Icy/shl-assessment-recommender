@@ -2,7 +2,7 @@ import pandas as pd
 import pickle
 from embedding.openai_client import embed_text
 
-INPUT_CSV = "data/processed/assessments_clean.csv"
+INPUT_CSV = "data/processed/assessments_structured.csv"
 OUTPUT_FILE = "data/processed/embeddings.pkl"
 
 
@@ -24,6 +24,7 @@ def build_embeddings():
         records.append({
             "name": row["name"],
             "url": row["url"],
+            "adaptive"
             "embedding": vector
         })
 

@@ -11,7 +11,7 @@ def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 
-def search(query: str, top_k: int = 5):
+def search(query: str, top_k: int = 25):
     # Load stored embeddings
     with open(EMBEDDINGS_FILE, "rb") as f:
         records = pickle.load(f)
@@ -38,7 +38,7 @@ if __name__ == "__main__":
             break
 
         results = search(query)
-        
+
         print("\nTop matches:")
         for score, r in results:
             print(f"- {r['name']} ({score:.3f})")
