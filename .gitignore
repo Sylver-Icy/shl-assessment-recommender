@@ -8,8 +8,5 @@ __pycache__/
 venv/
 .env
 
-# Data artifacts
-data/processed/embeddings.pkl
-
 # OS junk
 .DS_Store
