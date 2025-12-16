@@ -7,11 +7,14 @@ class RecommendRequest(BaseModel):
     top_k: int = 10
 
 
-class Assessment(BaseModel):
-    name: str
+class RecommendedAssessment(BaseModel):
     url: str
-    score: float
+    adaptive_support: str  # "Yes" / "No"
+    description: str
+    duration: int
+    remote_support: str  # "Yes" / "No"
+    test_type: List[str]
 
 
 class RecommendResponse(BaseModel):
-    results: List[Assessment]
+    recommended_assessments: List[RecommendedAssessment]

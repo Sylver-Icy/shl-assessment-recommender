@@ -6,7 +6,7 @@ load_dotenv()
 
 _client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-EMBEDDING_MODEL = "text-embedding-3-large"
+EMBEDDING_MODEL = "text-embedding-3-small"
 
 
 def embed_text(text: str) -> list[float]:

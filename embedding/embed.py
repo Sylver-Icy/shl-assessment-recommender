@@ -24,7 +24,13 @@ def build_embeddings():
         records.append({
             "name": row["name"],
             "url": row["url"],
-            "adaptive"
+            "remote_support": row.get("remote_support"),
+            "adaptive_support": row.get("adaptive_support"),
+            "description": desc,
+            "job_levels": row.get("job_levels"),
+            "languages": row.get("languages"),
+            "duration_minutes": row.get("duration_minutes"),
+            "test_type": row.get("test_type"),
             "embedding": vector
         })
 
