@@ -50,16 +50,22 @@ def adjust_score(base_score, record, intent):
     return score
 
 def enforce_required_types(results, required_types, k=10):
+    """
+    Ensure at least one assessment per required test type (e.g., K, P, A)
+    when the query spans multiple domains.
+    """
     final = []
-    used_types = set()
+    covered_types = set()
 
-    for score, r in results:
-        if len(final) >= k:
-            break
-        if required_types.intersection(r["test_type"]):
-            final.append((score, r))
-            used_types.update(r["test_type"])
+    # 1. First pass: pick the best item for each required test type
+    for req_type in required_types:
+        for score, r in results:
+            if req_type in (r.get("test_type") or []):
+                final.append((score, r))
+                covered_types.add(req_type)
+                break
 
+    # 2. Second pass: fill remaining slots by score
     for score, r in results:
         if len(final) >= k:
             break
