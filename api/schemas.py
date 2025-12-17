@@ -9,9 +9,10 @@ class RecommendRequest(BaseModel):
 
 class RecommendedAssessment(BaseModel):
     url: str
+    name: str
     adaptive_support: str  # "Yes" / "No"
     description: str
-    duration: int
+    duration: str
     remote_support: str  # "Yes" / "No"
     test_type: List[str]
 

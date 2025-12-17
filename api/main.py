@@ -23,18 +23,15 @@ def recommend(req: RecommendRequest):
     formatted = [
         RecommendedAssessment(
             url=r["url"],
+            name=r["name"],
             adaptive_support=r["adaptive_support"],
             description=r["description"],
-            duration=(
-                int(r["duration_minutes"])
-                if isinstance(r.get("duration_minutes"), (int, float)) and not isinstance(r.get("duration_minutes"), bool)
-                else 0
-            ),
+            duration=r.get("duration_minutes"),
             remote_support=r["remote_support"],
             test_type=(
-                r["test_type"]
-                if isinstance(r.get("test_type"), list)
-                else [t.strip().strip("'\"") for t in str(r.get("test_type")).strip("[]").split(",") if t.strip()]
+                r["expanded_test_type"]
+                if isinstance(r.get("expanded_test_type"), list)
+                else [t.strip().strip("'\"") for t in str(r.get("expanded_test_type")).strip("[]").split(",") if t.strip()]
             ),
         )
         for r in results

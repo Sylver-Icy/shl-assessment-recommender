@@ -49,7 +49,7 @@ def build_embeddings():
             "languages": row.get("languages"),
             "duration_minutes": row.get("duration_minutes"),
             "test_type": row.get("test_type"),
-            "expanded_test_tyoe": row.get("expanded_test_type"),
+            "expanded_test_type": row.get("expanded_test_type"),
             "embedding": vector
         })
 
