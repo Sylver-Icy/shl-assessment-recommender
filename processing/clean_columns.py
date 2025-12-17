@@ -1,13 +1,25 @@
 import re
 import pandas as pd
 
+TEST_TYPE_MAP = {
+    "A": "Ability & Aptitude",
+    "B": "Biodata & Situational Judgement",
+    "C": "Competencies",
+    "D": "Development & 360",
+    "E": "Assessment Exercises",
+    "K": "Knowledge & Skills",
+    "P": "Personality & Behavior",
+    "S": "Simulations"
+}
+
 def extract_fields(description: str):
     if not isinstance(description, str):
         return {
             "job_levels": None,
             "languages": None,
             "duration_minutes": None,
-            "test_type": []
+            "test_type": [],
+            "expanded_test_type": []
         }
 
     # Job Levels
@@ -55,12 +67,16 @@ def extract_fields(description: str):
     re.findall(r"[A-Z]", test_type_match.group(1))
     if test_type_match else []
 )
+    expanded_test_type = [
+        TEST_TYPE_MAP[t] for t in test_type if t in TEST_TYPE_MAP
+    ]
 
     return {
         "job_levels": job_levels,
         "languages": languages,
         "duration_minutes": duration_minutes,
-        "test_type": test_type
+        "test_type": test_type,
+        "expanded_test_type": expanded_test_type
     }
 
 df = pd.read_csv("data/processed/assessments_clean.csv")

@@ -25,7 +25,11 @@ def recommend(req: RecommendRequest):
             url=r["url"],
             adaptive_support=r["adaptive_support"],
             description=r["description"],
-            duration=int(r["duration_minutes"]) if r.get("duration_minutes") == r.get("duration_minutes") else 0,
+            duration=(
+                int(r["duration_minutes"])
+                if isinstance(r.get("duration_minutes"), (int, float)) and not isinstance(r.get("duration_minutes"), bool)
+                else 0
+            ),
             remote_support=r["remote_support"],
             test_type=(
                 r["test_type"]

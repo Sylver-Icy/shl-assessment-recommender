@@ -13,11 +13,29 @@ def build_embeddings():
 
     for _, row in df.iterrows():
         desc = row.get("description")
+        name = row.get("name")
+        expanded_test_type = row.get("expanded_test_type")
+
+        parts = []
 
         if isinstance(desc, str) and desc.strip():
-            text = desc
-        else:
-            text = row["name"]
+            parts.append(desc)
+
+        if isinstance(expanded_test_type, str) and expanded_test_type.strip():
+            parts.append(f"Tests: {expanded_test_type}")
+
+        if not parts and isinstance(name, str) and name.strip():
+            parts.append(name)
+
+        # If description exists but test type does not, fall back to description + name
+        if (
+            isinstance(desc, str) and desc.strip()
+            and not (isinstance(expanded_test_type, str) and expanded_test_type.strip())
+            and isinstance(name, str) and name.strip()
+        ):
+            parts.append(name)
+
+        text = ". ".join(dict.fromkeys(parts))
 
         vector = embed_text(text)
 
@@ -31,6 +49,7 @@ def build_embeddings():
             "languages": row.get("languages"),
             "duration_minutes": row.get("duration_minutes"),
             "test_type": row.get("test_type"),
+            "expanded_test_tyoe": row.get("expanded_test_type"),
             "embedding": vector
         })
 
