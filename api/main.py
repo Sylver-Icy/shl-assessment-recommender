@@ -10,7 +10,7 @@ app = FastAPI(
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "healthy"}
 
 
 @app.post("/recommend", response_model=RecommendResponse)
@@ -20,21 +20,43 @@ def recommend(req: RecommendRequest):
 
     results = recommend_assessments(req.query, top_k=req.top_k)
 
-    formatted = [
-        RecommendedAssessment(
-            url=r["url"],
-            name=r["name"],
-            adaptive_support=r["adaptive_support"],
-            description=r["description"],
-            duration=r.get("duration_minutes"),
-            remote_support=r["remote_support"],
-            test_type=(
-                r["expanded_test_type"]
-                if isinstance(r.get("expanded_test_type"), list)
-                else [t.strip().strip("'\"") for t in str(r.get("expanded_test_type")).strip("[]").split(",") if t.strip()]
-            ),
+    formatted = []
+
+    for r in results:
+        # ---- duration normalization ----
+        raw_duration = r.get("duration_minutes")
+
+        if isinstance(raw_duration, int):
+            duration = raw_duration
+        elif isinstance(raw_duration, str) and raw_duration.isdigit():
+            duration = int(raw_duration)
+        else:
+            duration = 0
+        # -------------------------------------------
+
+        # ---- test type normalization ----
+        if isinstance(r.get("expanded_test_type"), list):
+            test_type = r["expanded_test_type"]
+        else:
+            test_type = [
+                t.strip().strip("'\"")
+                for t in str(r.get("expanded_test_type", ""))
+                .strip("[]")
+                .split(",")
+                if t.strip()
+            ]
+        # --------------------------------
+
+        formatted.append(
+            RecommendedAssessment(
+                url=r["url"],
+                name=r["name"],
+                adaptive_support=r["adaptive_support"],
+                description=r["description"],
+                duration=duration,
+                remote_support=r["remote_support"],
+                test_type=test_type,
+            )
         )
-        for r in results
-    ]
 
     return RecommendResponse(recommended_assessments=formatted)

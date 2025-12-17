@@ -32,9 +32,15 @@ Return ONLY valid JSON in this format:
   "preferred_test_types": [],
   "remote_required": "Yes" | "No" | "Unknown",
   "adaptive_required": "Yes" | "No" | "Unknown",
-  "experience_level": null,
-  "time_constraint_minutes": null
+  "experience_level": "DoesNotMatter",
+  "time_constraint_minutes": 0
 }
+
+Rules:
+- If no time limit is specified or implied, set time_constraint_minutes to 0.
+- If a time limit is mentioned or implied (e.g. "90 mins", "under an hour", "short"), convert it to minutes and return an integer.
+- If experience level is not specified, set experience_level to "DoesNotMatter".
+- Do NOT return null for experience_level or time_constraint_minutes.
 """
 
 def extract_intent(query: str) -> dict:
@@ -57,6 +63,6 @@ def extract_intent(query: str) -> dict:
             "preferred_test_types": [],
             "remote_required": "Unknown",
             "adaptive_required": "Unknown",
-            "experience_level": None,
-            "time_constraint_minutes": None
+            "experience_level": "DoesNotMatter",
+            "time_constraint_minutes": 0
         }

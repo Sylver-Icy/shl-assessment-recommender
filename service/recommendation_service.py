@@ -5,33 +5,40 @@ def adjust_score(base_score, record, intent):
     required = set(intent["required_test_types"])
     record_types = set(record["test_type"] or [])
 
-    if required and not required.intersection(record_types):
-        score -= 0.9
+    if required:
+        missing = len(required - record_types)
+        if missing > 0:
+            score -= 0.3 * missing
 
     # 2. Preferred test types (SOFT boost)
     preferred = set(intent["preferred_test_types"])
-    if preferred.intersection(record_types):
-        score += 0.5
+    pref_matches = len(preferred.intersection(record_types))
+    if pref_matches > 0:
+        score += min(0.2 * pref_matches, 0.6)
 
     # 2b. Strong intent alignment boost
     if required.intersection(record_types):
-        score += 0.7
+        score += 0.3
 
     # 3. Remote requirement
     if intent["remote_required"] == "Yes" and record["remote_support"] != "Yes":
         score -= 0.4
+    if intent["remote_required"] == "Yes" and record["remote_support"] == "Yes":
+        score += 0.2
 
     # 4. Adaptive requirement
     if intent["adaptive_required"] == "Yes" and record["adaptive_support"] != "Yes":
         score -= 0.2
+    if intent["adaptive_required"] == "Yes" and record["adaptive_support"] == "Yes":
+        score += 0.1
 
     # 5. Time constraint
     max_time = intent["time_constraint_minutes"]
     duration = record["duration_minutes"]
 
-    if max_time and isinstance(duration, int):
-        if duration > max_time + 10:   # grace window
-            score -= 0.4
+    if max_time and isinstance(duration, int) and duration > max_time:
+        overflow_ratio = (duration - max_time) / max_time
+        score -= min(0.5, overflow_ratio)
 
     if max_time and isinstance(duration, int) and duration <= max_time:
         score += 0.2
@@ -43,11 +50,13 @@ def adjust_score(base_score, record, intent):
     if not isinstance(job_levels, (list, set)):
         job_levels = []
 
-    if exp and exp not in job_levels:
-        score -= 0.5
+    if exp != "DoesNotMatter":
+        if exp in job_levels:
+            score += 0.2
+        else:
+            score -= 0.5
 
-    if exp and exp in job_levels:
-        score += 0.2
+    score = max(min(score, 1.0), -1.0)
     return score
 
 def enforce_required_types(results, required_types, k=10):

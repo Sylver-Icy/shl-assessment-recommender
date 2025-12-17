@@ -12,7 +12,7 @@ class RecommendedAssessment(BaseModel):
     name: str
     adaptive_support: str  # "Yes" / "No"
     description: str
-    duration: str
+    duration: int
     remote_support: str  # "Yes" / "No"
     test_type: List[str]
 
