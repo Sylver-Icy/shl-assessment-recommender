@@ -1,3 +1,12 @@
+from processing.intent_extraction import extract_intent
+from embedding.index import search
+
+from logger.logging_config import get_logger, log_json
+
+eval_logger = get_logger(
+    name="eval",
+    logfile="logs/eval.jsonl"
+)
 def adjust_score(base_score, record, intent):
     score = base_score
 
@@ -84,8 +93,7 @@ def enforce_required_types(results, required_types, k=10):
 
     return final
 
-from processing.intent_extraction import extract_intent
-from embedding.index import search
+
 
 def recommend_assessments(query: str, top_k: int = 10):
     # 1. Extract intent using LLM
@@ -110,7 +118,15 @@ def recommend_assessments(query: str, top_k: int = 10):
         reranked = enforce_required_types(reranked, required_types, k=top_k)
 
     # 6. Return top-k records only
+
+    log_json(eval_logger, {
+        "query": query,
+        "intent": intent,
+        "final_top10": [record.get("name") for _, record in reranked[:top_k]],
+    })
+
     return [record for _, record in reranked[:top_k]]
+
 
 if __name__ == "__main__":
     print("Assessment Recommender (type 'exit' to quit)\n")
@@ -131,7 +147,7 @@ if __name__ == "__main__":
 
             print("\nTop Recommendations:")
             for i, r in enumerate(results, start=1):
-                name = r.get("name") or r.get("assessment_name") or "Unknown"
+                name = r.get("name")
                 expanded_test_type = r.get("expanded_test_type")
                 duration = r.get("duration_minutes")
 
