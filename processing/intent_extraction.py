@@ -41,6 +41,11 @@ Rules:
 - If a time limit is mentioned or implied (e.g. "90 mins", "under an hour", "short"), convert it to minutes and return an integer.
 - If experience level is not specified, set experience_level to "DoesNotMatter".
 - Do NOT return null for experience_level or time_constraint_minutes.
+IMPORTANT:
+If the job description mentions specific tools, technologies, or hands-on tasks
+(e.g., Selenium, automation, testing, SQL, JavaScript, frameworks),
+prioritize Knowledge & Skills (K) and Simulations (S)
+over Ability & Aptitude (A).
 """
 
 def extract_intent(query: str) -> dict:

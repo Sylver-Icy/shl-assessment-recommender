@@ -27,7 +27,7 @@ def adjust_score(base_score, record, intent):
 
     # 2b. Strong intent alignment boost
     if required.intersection(record_types):
-        score += 0.3
+        score += 0.6
 
     # 3. Remote requirement
     if intent["remote_required"] == "Yes" and record["remote_support"] != "Yes":
@@ -115,14 +115,46 @@ def recommend_assessments(query: str, top_k: int = 10):
     # 5. Enforce required test type coverage
     required_types = set(intent["required_test_types"])
     if required_types:
-        reranked = enforce_required_types(reranked, required_types, k=top_k)
+        reranked = enforce_required_types(reranked, required_types, k=len(reranked))
 
-    # 6. Return top-k records only
+    # 6. Log full candidate set, return top-k
+
+    # 6. Log Top-25 semantic candidates (FULL, untruncated)
+
+    top25_logged = []
+    for base_score, record in scored_results[:25]:
+        final_score = adjust_score(base_score, record, intent)
+        top25_logged.append({
+            "name": record.get("name"),
+            "url": record.get("url"),
+            "test_type": record.get("test_type"),
+            "expanded_test_type": record.get("expanded_test_type"),
+            "duration_minutes": record.get("duration_minutes"),
+            "job_levels": record.get("job_levels"),
+            "remote_support": record.get("remote_support"),
+            "adaptive_support": record.get("adaptive_support"),
+            "semantic_score": base_score,
+            "final_score": final_score
+        })
+
+    top10_logged = []
+    for final_score, record in reranked[:top_k]:
+        top10_logged.append({
+            "name": record.get("name"),
+            "url": record.get("url"),
+            "test_type": record.get("test_type"),
+            "expanded_test_type": record.get("expanded_test_type"),
+            "duration_minutes": record.get("duration_minutes"),
+            "job_levels": record.get("job_levels"),
+            "remote_support": record.get("remote_support"),
+            "adaptive_support": record.get("adaptive_support"),
+            "final_score": final_score
+        })
 
     log_json(eval_logger, {
         "query": query,
-        "intent": intent,
-        "final_top10": [record.get("name") for _, record in reranked[:top_k]],
+        "top25": top25_logged,
+        "top10": top10_logged
     })
 
     return [record for _, record in reranked[:top_k]]

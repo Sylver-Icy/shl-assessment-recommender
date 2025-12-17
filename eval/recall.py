@@ -7,6 +7,10 @@ FILE_PATH = "data/train/Gen_AI Dataset.xlsx"
 TRAIN_SHEET = "Train-Set"
 K = 10
 
+# Configurable controls for batching
+START_AT = 2      # index of query to start from (0-based)
+PROCESS_N = 1     # how many queries to process
+
 gt_logger = get_logger(
     name="ground_truth_eval",
     logfile="logs/ground_truth_eval.jsonl"
@@ -79,7 +83,11 @@ def evaluate():
     # Group rows by Query so we aggregate all correct answers per query
     grouped = df.groupby("Query")
 
-    for query, group in grouped:
+    for i, (query, group) in enumerate(grouped):
+        if i < START_AT:
+            continue
+        if i >= START_AT + PROCESS_N:
+            break
         # Collect ALL relevant assessments for this query
         relevant = set()
         for cell in group["Assessment_url"]:
