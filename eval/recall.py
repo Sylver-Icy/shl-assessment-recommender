@@ -8,8 +8,8 @@ TRAIN_SHEET = "Train-Set"
 K = 10
 
 # Configurable controls for batching
-START_AT = 2      # index of query to start from (0-based)
-PROCESS_N = 1     # how many queries to process
+START_AT = 0      # index of query to start from (0-based)
+PROCESS_N = 10     # how many queries to process
 
 gt_logger = get_logger(
     name="ground_truth_eval",

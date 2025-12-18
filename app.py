@@ -1,5 +1,5 @@
 import streamlit as st
-from embedding.index import search
+from service.recommendation_service import recommend_assessments
 
 st.set_page_config(
     page_title="SHL Assessment Recommender",
@@ -23,19 +23,23 @@ if st.button("Find Assessments"):
         st.warning("Please enter a query.")
     else:
         with st.spinner("Searching assessments..."):
-            results = search(query, top_k=top_k)
+            results = recommend_assessments(query, top_k=top_k)
 
         if not results:
             st.info("No relevant assessments found.")
         else:
             st.subheader("Recommended Assessments")
 
-            for score, r in results:
+            for r in results:
                 st.markdown(
                     f"""
-                    **{r['name']}**
-                    Similarity score: `{score:.3f}`
-                    🔗 [View assessment]({r['url']})
+                    **{r.get('name','')}**
+                    🔗 [View assessment]({r.get('url','')})
+
+                    - Test type: `{', '.join(r.get('test_type', []))}`
+                    - Duration: `{r.get('duration_minutes', r.get('duration',''))}`
+                    - Remote: `{r.get('remote_support','')}`
+                    - Adaptive: `{r.get('adaptive_support','')}`
                     ---
                     """
                 )

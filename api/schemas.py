@@ -1,10 +1,10 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 
 class RecommendRequest(BaseModel):
     query: str
-    top_k: int = 10
+    top_k: Optional[int] = None
 
 
 class RecommendedAssessment(BaseModel):

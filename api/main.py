@@ -18,7 +18,9 @@ def recommend(req: RecommendRequest):
     if not req.query.strip():
         raise HTTPException(status_code=400, detail="Query cannot be empty")
 
-    results = recommend_assessments(req.query, top_k=req.top_k)
+    # Default top_k to 10 if not provided in request
+    top_k = req.top_k if req.top_k is not None else 10
+    results = recommend_assessments(req.query, top_k=top_k)
 
     formatted = []
 
